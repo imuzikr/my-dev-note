@@ -1,0 +1,956 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GitHub는 무엇을 보여줄까?</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17212b;
+      --muted: #617080;
+      --line: #d8e0e8;
+      --paper: #f7f9fb;
+      --white: #ffffff;
+      --git: #e4572e;
+      --hub: #24292f;
+      --tree: #118a8a;
+      --blob: #7b61ff;
+      --push: #d49b18;
+      --good: #167a4a;
+      --warn: #b45616;
+      --shadow: 0 18px 45px rgba(23, 33, 43, 0.1);
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Malgun Gothic", "Apple SD Gothic Neo", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, rgba(247, 249, 251, 0.95), rgba(247, 249, 251, 1)),
+        repeating-linear-gradient(90deg, rgba(23, 33, 43, 0.04) 0 1px, transparent 1px 72px);
+      letter-spacing: 0;
+    }
+
+    main {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 48px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(280px, 0.92fr);
+      gap: 24px;
+      align-items: stretch;
+      min-height: calc(100vh - 72px);
+    }
+
+    .hero-copy {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 20px 0 52px;
+    }
+
+    .kicker {
+      width: fit-content;
+      margin: 0 0 16px;
+      padding: 8px 11px;
+      border: 1px solid rgba(228, 87, 46, 0.25);
+      border-radius: 999px;
+      color: #a33d20;
+      background: #fff3ed;
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 760px;
+      font-size: clamp(2.15rem, 4.6vw, 5.15rem);
+      line-height: 1.03;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 680px;
+      margin: 22px 0 0;
+      color: var(--muted);
+      font-size: clamp(1.02rem, 1.5vw, 1.28rem);
+      line-height: 1.75;
+      word-break: keep-all;
+    }
+
+    .formula {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-top: 28px;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .formula span {
+      display: inline-flex;
+      align-items: center;
+      min-height: 36px;
+      padding: 8px 11px;
+      border-radius: var(--radius);
+      background: var(--white);
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 18px rgba(23, 33, 43, 0.06);
+      font-size: 0.96rem;
+    }
+
+    .formula b {
+      color: var(--git);
+    }
+
+    .arrow-text {
+      color: var(--push);
+      font-weight: 900;
+    }
+
+    .browser-art {
+      align-self: center;
+      min-height: 520px;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .browser-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 42px;
+      padding: 0 14px;
+      border-bottom: 1px solid var(--line);
+      background: #eef2f6;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--git);
+    }
+
+    .dot:nth-child(2) {
+      background: var(--push);
+    }
+
+    .dot:nth-child(3) {
+      background: var(--good);
+    }
+
+    .url {
+      margin-left: 8px;
+      min-width: 0;
+      padding: 6px 10px;
+      border-radius: 999px;
+      color: #526170;
+      background: var(--white);
+      font-size: 0.78rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .repo-head {
+      padding: 22px 22px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .repo-name {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 12px;
+      font-size: 1.15rem;
+      font-weight: 850;
+    }
+
+    .repo-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 30px;
+      padding: 6px 9px;
+      border-radius: 999px;
+      background: #f5f7fa;
+      border: 1px solid var(--line);
+      color: #526170;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .file-list {
+      padding: 18px 22px 22px;
+    }
+
+    .file-row {
+      display: grid;
+      grid-template-columns: 24px minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      min-height: 42px;
+      border-bottom: 1px solid #edf1f5;
+      color: #26323f;
+      font-size: 0.94rem;
+    }
+
+    .file-row:last-child {
+      border-bottom: 0;
+    }
+
+    .file-row small {
+      color: var(--muted);
+      font-size: 0.76rem;
+      white-space: nowrap;
+    }
+
+    .callout-strip {
+      margin: 20px 22px 22px;
+      padding: 14px;
+      border-left: 5px solid var(--tree);
+      background: #effafa;
+      color: #245c5c;
+      font-weight: 800;
+      line-height: 1.5;
+      word-break: keep-all;
+    }
+
+    section {
+      margin-top: 28px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      margin: 0 0 14px;
+      font-size: clamp(1.35rem, 2.3vw, 2rem);
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .section-title::before {
+      content: "";
+      width: 10px;
+      height: 32px;
+      border-radius: 999px;
+      background: var(--git);
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .step {
+      position: relative;
+      min-height: 230px;
+      padding: 18px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: var(--white);
+      box-shadow: 0 10px 24px rgba(23, 33, 43, 0.06);
+    }
+
+    .step:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      top: 54px;
+      right: -11px;
+      width: 18px;
+      height: 18px;
+      border-top: 3px solid var(--push);
+      border-right: 3px solid var(--push);
+      transform: rotate(45deg);
+      z-index: 2;
+      background: var(--paper);
+    }
+
+    .num {
+      display: inline-grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      color: var(--white);
+      background: var(--hub);
+      font-weight: 900;
+      margin-bottom: 14px;
+    }
+
+    .step h3,
+    .object h3,
+    .truth h3,
+    .analogy h3 {
+      margin: 0 0 8px;
+      font-size: 1.02rem;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+
+    .step p,
+    .object p,
+    .truth p,
+    .analogy p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.62;
+      word-break: keep-all;
+    }
+
+    .mini-visual {
+      height: 68px;
+      margin: 12px 0 14px;
+      border-radius: var(--radius);
+      background: #f5f7fa;
+      border: 1px solid #e8edf2;
+      overflow: hidden;
+    }
+
+    .folder-lines {
+      padding: 11px 12px;
+    }
+
+    .line {
+      height: 8px;
+      margin-bottom: 9px;
+      border-radius: 999px;
+      background: #c9d4df;
+    }
+
+    .line:nth-child(1) {
+      width: 64%;
+      background: rgba(228, 87, 46, 0.45);
+    }
+
+    .line:nth-child(2) {
+      width: 82%;
+    }
+
+    .line:nth-child(3) {
+      width: 48%;
+      background: rgba(17, 138, 138, 0.4);
+    }
+
+    .database {
+      display: grid;
+      place-items: center;
+      position: relative;
+    }
+
+    .database svg,
+    .commit-graph svg,
+    .web-render svg,
+    .push-visual svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .objects {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+    }
+
+    .object {
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: var(--white);
+      padding: 20px;
+      min-height: 210px;
+      box-shadow: 0 10px 24px rgba(23, 33, 43, 0.06);
+    }
+
+    .object-icon {
+      display: grid;
+      place-items: center;
+      width: 54px;
+      height: 54px;
+      margin-bottom: 15px;
+      border-radius: 50%;
+      color: var(--white);
+      font-weight: 900;
+      background: var(--hub);
+    }
+
+    .object:nth-child(2) .object-icon {
+      background: var(--tree);
+    }
+
+    .object:nth-child(3) .object-icon {
+      background: var(--blob);
+    }
+
+    .truth-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 14px;
+    }
+
+    .truth {
+      padding: 22px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: var(--white);
+      box-shadow: 0 10px 24px rgba(23, 33, 43, 0.06);
+    }
+
+    .truth.false {
+      border-top: 5px solid var(--warn);
+    }
+
+    .truth.true {
+      border-top: 5px solid var(--good);
+    }
+
+    .comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .compare-box {
+      min-height: 154px;
+      padding: 16px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: #fbfcfd;
+    }
+
+    .compare-box strong {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 0.95rem;
+    }
+
+    .compare-box ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 0.88rem;
+    }
+
+    .analogy-band {
+      display: grid;
+      grid-template-columns: minmax(260px, 0.85fr) minmax(0, 1.15fr);
+      gap: 18px;
+      align-items: stretch;
+      padding: 26px;
+      border-radius: var(--radius);
+      background: #17212b;
+      color: var(--white);
+      overflow: hidden;
+    }
+
+    .analogy {
+      align-self: center;
+    }
+
+    .analogy h3 {
+      font-size: clamp(1.28rem, 2vw, 1.72rem);
+    }
+
+    .analogy p {
+      color: #c9d4df;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: 1fr 42px 1fr;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .film,
+    .wall {
+      min-height: 200px;
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      padding: 14px;
+    }
+
+    .film-strip {
+      display: grid;
+      grid-template-columns: 18px 1fr 18px;
+      gap: 10px;
+      height: 172px;
+    }
+
+    .holes {
+      display: grid;
+      gap: 8px;
+    }
+
+    .holes span {
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.22);
+    }
+
+    .frames {
+      display: grid;
+      grid-template-rows: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .frames span {
+      border-radius: 4px;
+      background: linear-gradient(135deg, rgba(228, 87, 46, 0.8), rgba(17, 138, 138, 0.8));
+    }
+
+    .gallery-arrow {
+      display: grid;
+      place-items: center;
+      color: var(--push);
+      font-size: 2rem;
+      font-weight: 900;
+    }
+
+    .wall {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .photo {
+      min-height: 82px;
+      border: 8px solid rgba(255, 255, 255, 0.78);
+      background: linear-gradient(145deg, #f1d48b, #75b9be);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.18);
+    }
+
+    .photo:nth-child(2) {
+      background: linear-gradient(145deg, #b8a6ff, #f1d48b);
+    }
+
+    .photo:nth-child(3) {
+      background: linear-gradient(145deg, #e98b68, #9fd3c7);
+    }
+
+    .photo:nth-child(4) {
+      background: linear-gradient(145deg, #91a7ff, #f8c4a4);
+    }
+
+    .summary {
+      padding: 24px;
+      border-radius: var(--radius);
+      background: var(--white);
+      border: 1px solid var(--line);
+      box-shadow: 0 10px 24px rgba(23, 33, 43, 0.06);
+    }
+
+    .summary p {
+      max-width: 980px;
+      margin: 0;
+      font-size: clamp(1.02rem, 1.6vw, 1.22rem);
+      line-height: 1.75;
+      word-break: keep-all;
+    }
+
+    .summary strong {
+      color: var(--git);
+    }
+
+    svg.icon {
+      width: 22px;
+      height: 22px;
+      flex: 0 0 auto;
+    }
+
+    @media (max-width: 980px) {
+      header,
+      .analogy-band {
+        grid-template-columns: 1fr;
+        min-height: auto;
+      }
+
+      .hero-copy {
+        padding-bottom: 0;
+      }
+
+      .browser-art {
+        min-height: 0;
+      }
+
+      .flow {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+
+      .step {
+        min-height: 0;
+      }
+
+      .step:not(:last-child)::after {
+        top: auto;
+        right: auto;
+        left: 50%;
+        bottom: -22px;
+        width: 14px;
+        height: 14px;
+        border-top: 0;
+        border-right: 3px solid var(--push);
+        border-bottom: 3px solid var(--push);
+        border-left: 0;
+        transform: translateX(-50%) rotate(45deg);
+        background: transparent;
+      }
+
+      .objects,
+      .truth-grid,
+      .comparison {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      main {
+        width: min(100% - 20px, 1180px);
+        padding-top: 16px;
+      }
+
+      h1 {
+        font-size: 2.4rem;
+      }
+
+      .repo-head,
+      .file-list {
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+
+      .file-row {
+        grid-template-columns: 24px minmax(0, 1fr);
+      }
+
+      .file-row small {
+        display: none;
+      }
+
+      .gallery {
+        grid-template-columns: 1fr;
+      }
+
+      .gallery-arrow {
+        transform: rotate(90deg);
+      }
+
+      .analogy-band {
+        padding: 18px;
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      main {
+        width: 100%;
+        padding: 0;
+      }
+
+      header {
+        min-height: auto;
+      }
+
+      .step,
+      .object,
+      .truth,
+      .summary,
+      .browser-art {
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header aria-labelledby="page-title">
+      <div class="hero-copy">
+        <p class="kicker">GitHub 화면을 정확히 이해하는 한 장</p>
+        <h1 id="page-title">GitHub는 내 폴더가 아니라 Git 저장소를 보여준다</h1>
+        <p class="lead">
+          GitHub의 파일 목록은 내 컴퓨터 작업 디렉토리를 실시간으로 비추는 창이 아닙니다.
+          GitHub 서버에 push된 저장소에서 특정 커밋이 가리키는 tree와 blob을 읽어,
+          웹에서 폴더처럼 보이도록 렌더링한 화면입니다.
+        </p>
+        <div class="formula" aria-label="핵심 공식">
+          <span>로컬 파일</span>
+          <b class="arrow-text">→</b>
+          <span><b>commit</b>으로 기록</span>
+          <b class="arrow-text">→</b>
+          <span><b>push</b>로 서버 복사본에 전달</span>
+          <b class="arrow-text">→</b>
+          <span>GitHub가 렌더링</span>
+        </div>
+      </div>
+
+      <aside class="browser-art" aria-label="GitHub 파일 목록 예시">
+        <div class="browser-bar">
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <div class="url">github.com/team/project/tree/main</div>
+        </div>
+        <div class="repo-head">
+          <p class="repo-name">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M3 7.5V18a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-7l-2-2H5a2 2 0 0 0-2 2.5Z"/>
+            </svg>
+            project
+          </p>
+          <div class="repo-meta">
+            <span class="pill">branch: main</span>
+            <span class="pill">latest commit: a1b2c3d</span>
+            <span class="pill">server-side repository</span>
+          </div>
+        </div>
+        <div class="file-list">
+          <div class="file-row">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="none" stroke="#118a8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M3 7.5V18a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-7l-2-2H5a2 2 0 0 0-2 2.5Z"/>
+            </svg>
+            <span>src</span>
+            <small>tree 객체에서 온 디렉토리 항목</small>
+          </div>
+          <div class="file-row">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="none" stroke="#7b61ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7Z"/>
+              <path fill="none" stroke="#7b61ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M14 2v5h5"/>
+            </svg>
+            <span>README.md</span>
+            <small>blob 객체의 파일 내용</small>
+          </div>
+          <div class="file-row">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="none" stroke="#7b61ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7Z"/>
+              <path fill="none" stroke="#7b61ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M14 2v5h5"/>
+            </svg>
+            <span>package.json</span>
+            <small>선택 커밋 기준</small>
+          </div>
+        </div>
+        <div class="callout-strip">
+          화면은 폴더 탐색기처럼 보이지만, 실제로는 선택된 커밋의 tree를 사람이 읽기 좋은 파일 목록으로 펼친 결과입니다.
+        </div>
+      </aside>
+    </header>
+
+    <section aria-labelledby="flow-title">
+      <h2 class="section-title" id="flow-title">한눈에 보는 흐름</h2>
+      <div class="flow">
+        <article class="step">
+          <span class="num">1</span>
+          <div class="mini-visual folder-lines">
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+          </div>
+          <h3>작업 디렉토리</h3>
+          <p>내 컴퓨터 폴더에 실제 파일이 펼쳐져 있습니다. 수정 중인 파일, 아직 commit하지 않은 파일도 여기에 있을 수 있습니다.</p>
+        </article>
+
+        <article class="step">
+          <span class="num">2</span>
+          <div class="mini-visual commit-graph">
+            <svg viewBox="0 0 220 80" role="img" aria-label="커밋 그래프">
+              <path d="M32 40H188" fill="none" stroke="#c9d4df" stroke-width="5" stroke-linecap="round"/>
+              <circle cx="42" cy="40" r="11" fill="#e4572e"/>
+              <circle cx="96" cy="40" r="11" fill="#24292f"/>
+              <circle cx="150" cy="40" r="11" fill="#118a8a"/>
+              <path d="M96 40C104 18 130 18 150 40" fill="none" stroke="#d49b18" stroke-width="4" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3>commit으로 기록</h3>
+          <p>Git은 그 시점의 파일 스냅샷과 이력을 객체 데이터베이스에 저장합니다. 이때 commit, tree, blob이 연결됩니다.</p>
+        </article>
+
+        <article class="step">
+          <span class="num">3</span>
+          <div class="mini-visual database">
+            <svg viewBox="0 0 220 80" role="img" aria-label="로컬 Git 객체 데이터베이스">
+              <ellipse cx="110" cy="20" rx="64" ry="15" fill="#fff" stroke="#e4572e" stroke-width="4"/>
+              <path d="M46 20v34c0 8 29 15 64 15s64-7 64-15V20" fill="#fff3ed" stroke="#e4572e" stroke-width="4"/>
+              <path d="M46 37c0 8 29 15 64 15s64-7 64-15" fill="none" stroke="#e4572e" stroke-width="3"/>
+            </svg>
+          </div>
+          <h3>로컬 .git 저장소</h3>
+          <p>로컬 `.git`은 내 컴퓨터의 Git 저장소입니다. GitHub가 직접 이 폴더를 읽는 것은 아닙니다.</p>
+        </article>
+
+        <article class="step">
+          <span class="num">4</span>
+          <div class="mini-visual push-visual">
+            <svg viewBox="0 0 240 84" role="img" aria-label="로컬 Git 저장소에서 GitHub 서버 저장소로 push">
+              <rect x="14" y="18" width="56" height="48" rx="9" fill="#fff3ed" stroke="#e4572e" stroke-width="4"/>
+              <path d="M27 33h13l5 6h12v17H27Z" fill="none" stroke="#e4572e" stroke-width="4" stroke-linejoin="round"/>
+              <path d="M78 42h76" fill="none" stroke="#d49b18" stroke-width="7" stroke-linecap="round"/>
+              <path d="M137 25l22 17-22 17" fill="none" stroke="#d49b18" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="193" cy="42" r="29" fill="#24292f"/>
+              <path d="M180 50c-5-4-8-9-8-15 0-10 9-18 21-18s21 8 21 18c0 6-3 11-8 15" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+              <path d="M183 32l-5-7M203 32l5-7" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+              <path d="M184 58h18M193 50v12" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+              <text x="193" y="78" text-anchor="middle" fill="#24292f" font-size="10" font-weight="800">GitHub</text>
+            </svg>
+          </div>
+          <h3>push로 서버에 복사</h3>
+          <p>commit을 push하면 GitHub 서버의 저장소 복사본에 이력이 전달됩니다. commit만 하고 push하지 않으면 GitHub 화면은 바뀌지 않습니다.</p>
+        </article>
+
+        <article class="step">
+          <span class="num">5</span>
+          <div class="mini-visual web-render">
+            <svg viewBox="0 0 220 80" role="img" aria-label="GitHub 웹 렌더링">
+              <rect x="38" y="14" width="144" height="52" rx="8" fill="#fff" stroke="#24292f" stroke-width="4"/>
+              <path d="M38 28h144" stroke="#24292f" stroke-width="4"/>
+              <path d="M58 42h88M58 54h56" stroke="#118a8a" stroke-width="5" stroke-linecap="round"/>
+              <circle cx="52" cy="21" r="3" fill="#e4572e"/>
+              <circle cx="63" cy="21" r="3" fill="#d49b18"/>
+              <circle cx="74" cy="21" r="3" fill="#167a4a"/>
+            </svg>
+          </div>
+          <h3>GitHub가 렌더링</h3>
+          <p>GitHub는 기본 브랜치의 최신 commit 같은 선택된 commit을 기준으로 파일 구조와 이력을 웹 화면에 보여줍니다.</p>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="objects-title">
+      <h2 class="section-title" id="objects-title">Git 내부 객체 3종 세트</h2>
+      <div class="objects">
+        <article class="object">
+          <div class="object-icon">C</div>
+          <h3>commit</h3>
+          <p>어느 시점의 기록입니다. 작성자, 메시지, 부모 commit, 그리고 그 시점의 최상위 tree를 가리킵니다.</p>
+        </article>
+        <article class="object">
+          <div class="object-icon">T</div>
+          <h3>tree</h3>
+          <p>디렉토리 구조입니다. 파일 이름, 하위 디렉토리, 각 항목이 가리키는 blob이나 tree 정보를 담습니다.</p>
+        </article>
+        <article class="object">
+          <div class="object-icon">B</div>
+          <h3>blob</h3>
+          <p>파일 내용입니다. 이름이나 위치가 아니라 내용 자체가 저장되며, tree가 이 blob에 파일 이름을 붙여 연결합니다.</p>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="truth-title">
+      <h2 class="section-title" id="truth-title">오해를 바로잡기</h2>
+      <div class="truth-grid">
+        <article class="truth false">
+          <h3>조금 부정확한 표현</h3>
+          <p>GitHub는 내 컴퓨터의 `.git` 폴더를 렌더링한다.</p>
+          <div class="comparison">
+            <div class="compare-box">
+              <strong>왜 아쉬울까?</strong>
+              <ul>
+                <li>GitHub는 로컬 디스크에 접근하지 않습니다.</li>
+                <li>push되지 않은 commit은 GitHub에 없습니다.</li>
+                <li>working directory의 미커밋 변경도 보이지 않습니다.</li>
+              </ul>
+            </div>
+            <div class="compare-box">
+              <strong>헷갈리는 이유</strong>
+              <ul>
+                <li>화면이 폴더 탐색기처럼 생겼습니다.</li>
+                <li>로컬 `.git`과 GitHub 저장소가 같은 이력을 공유할 수 있습니다.</li>
+              </ul>
+            </div>
+          </div>
+        </article>
+
+        <article class="truth true">
+          <h3>더 정확한 표현</h3>
+          <p>GitHub는 서버에 저장된 Git 저장소의 객체 데이터베이스를 읽고, 선택된 commit의 tree와 blob을 파일 구조처럼 렌더링한다.</p>
+          <div class="comparison">
+            <div class="compare-box">
+              <strong>핵심 조건</strong>
+              <ul>
+                <li>GitHub 서버에 push되어 있어야 합니다.</li>
+                <li>브랜치나 태그가 어느 commit을 가리키는지가 중요합니다.</li>
+              </ul>
+            </div>
+            <div class="compare-box">
+              <strong>보이는 것</strong>
+              <ul>
+                <li>선택 commit의 파일 스냅샷</li>
+                <li>commit 이력과 비교 결과</li>
+                <li>tree와 blob을 해석한 웹 UI</li>
+              </ul>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="analogy-title">
+      <div class="analogy-band">
+        <div class="analogy">
+          <h3 id="analogy-title">비유: 필름 원본과 갤러리 전시</h3>
+          <p>
+            로컬 `.git`은 내 손에 있는 필름 원본에 가깝습니다.
+            push는 그 필름의 복사본을 GitHub 서버에 맡기는 일이고,
+            GitHub 웹 화면은 서버에 보관된 필름을 현상해 갤러리에 전시한 결과입니다.
+          </p>
+        </div>
+        <div class="gallery" aria-label="필름에서 갤러리로 전시되는 비유 그림">
+          <div class="film">
+            <div class="film-strip">
+              <div class="holes"><span></span><span></span><span></span><span></span></div>
+              <div class="frames"><span></span><span></span><span></span></div>
+              <div class="holes"><span></span><span></span><span></span><span></span></div>
+            </div>
+          </div>
+          <div class="gallery-arrow">→</div>
+          <div class="wall">
+            <div class="photo"></div>
+            <div class="photo"></div>
+            <div class="photo"></div>
+            <div class="photo"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section aria-label="정리">
+      <div class="summary">
+        <p>
+          한 문장으로 정리하면, <strong>GitHub는 내 작업 폴더를 그대로 보여주는 서비스가 아니라,
+          push된 서버 측 Git 저장소에서 선택된 commit의 tree와 blob을 읽어 파일 목록과 이력으로 렌더링하는 서비스</strong>입니다.
+          그래서 GitHub에 보이게 하려면 파일 수정뿐 아니라 commit과 push까지 이어져야 합니다.
+        </p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

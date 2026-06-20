@@ -1,0 +1,28 @@
+{
+	"nodes":[
+		{"id":"group_email","type":"group","x":-1480,"y":-400,"width":1400,"height":1440,"label":"1. 메일 본문 작성하기"},
+		{"id":"solution_group","type":"group","x":-1040,"y":120,"width":900,"height":840,"label":"모바일 문제 해결"},
+		{"id":"group_messenger","type":"group","x":160,"y":-400,"width":800,"height":400,"label":"2. 쿨 메신저"},
+		{"id":"solution_summary","type":"text","text":"**Gemini를 통한 해결:**\n- Gemini에게 질문하여 HTML 코드를 수정.\n- 이메일 코딩 모범 사례를 적용하여 문제 해결.","x":-990,"y":220,"width":350,"height":100,"color":"2"},
+		{"id":"solution_details","type":"text","text":"**주요 변경 사항:**\n1. **Fluid-Hybrid 디자인:** `width` 대신 `max-width` 사용.\n2. **인라인 스타일 강화:** 호환성을 위해 스타일을 인라인으로 적용.\n3. **Outlook 호환성:** 조건부 주석으로 '고스트 테이블' 기법 추가.\n4. **테이블 속성 최적화:** `role=\"presentation\"` 등 속성 추가.","x":-590,"y":220,"width":400,"height":420},
+		{"id":"solution_verification","type":"text","text":"**검증:**\n- 수정된 코드는 아이폰 사파리 등 대부분의 모바일 환경에서 정상적으로 표시됨.\n- 네이버 메일에서도 발송 및 수신 확인 완료.","x":-990,"y":370,"width":350,"height":270},
+		{"id":"21b2edefdea77656","type":"text","text":"","x":-1442,"y":395,"width":250,"height":60},
+		{"id":"email_process","type":"text","text":"**메일 작성 과정:**\n1. Gemini Canvas에서 디자인 결과물을 미리보기로 복사 (코드 복사 아님).\n2. 메일 본문에 붙여넣기 후 내용 수정 및 편집.\n3. 자주 사용하는 디자인은 템플릿으로 저장하여 재활용 가능.","x":-1430,"y":-300,"width":350,"height":325},
+		{"id":"mobile_issue","type":"text","text":"**모바일 호환성 문제:**\n- PC 브라우저에서는 정상적으로 보이나, 모바일에서는 메일 본문 정렬이 깨질 수 있음.","x":-980,"y":-300,"width":350,"height":180,"color":"5"},
+		{"id":"email_gem_reuse","type":"text","text":"**Gem을 활용한 재활용:**\n- 메일 미리보기 결과를 캡처하여 Gem의 지식에 첨부.\n- 요청 사항에 코드를 입력하여 일관된 디자인의 결과물 요청.","x":-1430,"y":100,"width":350,"height":220},
+		{"id":"email_image","type":"file","file":"70. Vibe Codig/70.03. Project/Image/Pasted image 20250905183017.png","x":-390,"y":720,"width":149,"height":180},
+		{"id":"title","type":"text","text":"## Gemini Canvas를 활용한 메일 및 메신저 작성\n\n[[메일 및 메신저 보내기]]","x":-350,"y":-760,"width":450,"height":200},
+		{"id":"messenger_process","type":"text","text":"**쿨 메신저 활용:**\n- Gemini Canvas 작업 결과를 복사하여 붙여넣기.\n- 내용 편집이 가능하며, HTML 렌더링 결과가 그대로 잘 보임.","x":210,"y":-300,"width":350,"height":250},
+		{"id":"messenger_image","type":"file","file":"70. Vibe Codig/70.03. Project/Image/Pasted image 20250905183116.png","x":610,"y":-300,"width":245,"height":250}
+	],
+	"edges":[
+		{"id":"edge1","fromNode":"title","fromSide":"bottom","toNode":"group_email","toSide":"top"},
+		{"id":"edge2","fromNode":"title","fromSide":"bottom","toNode":"group_messenger","toSide":"top"},
+		{"id":"edge3","fromNode":"email_process","fromSide":"right","toNode":"mobile_issue","toSide":"left"},
+		{"id":"edge4","fromNode":"mobile_issue","fromSide":"bottom","toNode":"solution_group","toSide":"top"},
+		{"id":"edge5","fromNode":"solution_summary","fromSide":"right","toNode":"solution_details","toSide":"left"},
+		{"id":"edge6","fromNode":"solution_summary","fromSide":"bottom","toNode":"solution_verification","toSide":"top"},
+		{"id":"edge7","fromNode":"solution_details","fromSide":"bottom","toNode":"email_image","toSide":"top"},
+		{"id":"edge8","fromNode":"messenger_process","fromSide":"right","toNode":"messenger_image","toSide":"left"}
+	]
+}
